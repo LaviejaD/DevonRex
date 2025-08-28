@@ -17,6 +17,7 @@ impl Client {
     pub fn write(&mut self, buf: &[u8]) -> std::io::Result<()> {
         self.stream.write(&buf)?;
         self.stream.flush()?;
+        print!("hola");
         Ok(())
     }
 

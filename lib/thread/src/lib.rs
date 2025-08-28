@@ -33,8 +33,15 @@ impl ThreadManager {
     }
 
     pub fn wait(&mut self) {
-        while let Some(w) = self.workers.pop() {
-            w.join();
+        let mut temp = Vec::new();
+        temp.append(&mut self.workers);
+
+        while let Some(w) = temp.pop() {
+            if !w.is_free() {
+                self.workers.push(w);
+            } else {
+                w.join();
+            }
         }
     }
 

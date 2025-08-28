@@ -3,7 +3,7 @@ use quote;
 use syn::{parse_macro_input, FnArg, Ident, ItemFn, Pat};
 
 #[proc_macro_attribute]
-pub fn route(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn middleware(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr = attr.to_string();
 
     let attrs: Vec<&str> = attr.split(",").collect();
@@ -22,25 +22,22 @@ pub fn route(attr: TokenStream, item: TokenStream) -> TokenStream {
     let method = get_attrs(&attrs, 0);
     let endpoint = get_attrs(&attrs, 1);
 
-    {
-        // let mut _s = quote::__private::TokenStream::new();
-        quote::quote! {
-             #[derive(Clone)]
-             pub struct #fn_name;
-            impl Route for #fn_name {
-                fn run(&self,#p:Request,mut client:Client)->thread::JoinHandle<()>{
-                    let yo = self.clone();
-                    let handle:thread::JoinHandle<()>  = thread::spawn(move||{
-                        let result = yo.callback(#p);
-                        let _ = client.write(result.http().as_bytes());
-                        let _ = client.close();
-                    });
-                    handle
-                }fn callback(&self,#p:Request)->Response {
-                    #block
-                }fn endpoint(&self)->(Method,String){
-                    (Method::from(#method.to_string()),#endpoint.to_string())
-                }
+    quote::quote! {
+         #[derive(Clone)]
+         pub struct #fn_name;
+        impl Route for #fn_name {
+            fn run(&self,#p:Request,mut client:Client)->thread::JoinHandle<()>{
+                let yo = self.clone();
+                let handle:thread::JoinHandle<()>  = thread::spawn(move||{
+                    let result = yo.callback(#p);
+                    let _ = client.write(result.http().as_bytes());
+                    let _ = client.close();
+                });
+                handle
+            }fn callback(&self,#p:Request)->Response {
+                #block
+            }fn endpoint(&self)->(Method,String){
+                (Method::from(#method.to_string()),#endpoint.to_string())
             }
         }
     }

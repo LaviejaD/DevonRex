@@ -1,4 +1,5 @@
 use crate::statuscode;
+//
 use std::collections::HashMap;
 pub struct Response {
     pub version: String,
@@ -32,7 +33,6 @@ impl Response {
         }
 
         http.push_str(&format!("\r\n\r\n{}", self.body));
-        // println!("{}", &http);
         http
     }
 }

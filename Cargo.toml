@@ -11,3 +11,4 @@ http = { path = "./lib/http"}
 client = {path = "./lib/client"}
 thread = {path ="./lib/thread"}
 middleware = { path ="./lib/middleware"}
+middleware_macro = { path ="./lib/middleware_macro"}
