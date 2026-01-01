@@ -1,5 +1,6 @@
-use devonrex::{prelude::*, utils};
+use devonrex::prelude::*;
 use std::{fs, thread};
+
 // http://127.0.0.1:8080/
 #[route(get,/)]
 fn Index(request: Request) -> Response {
@@ -22,12 +23,20 @@ fn Dynamic(request: Request) -> Response {
 
     response
 }
+#[middleware(get,/)]
+fn Midlewareprueba() -> State {
+    let mut response = Response::default();
+    response.body("hola mundo 123".to_string());
+    // State::Response(response)
+    State::Continue
+}
 
 fn main() {
-    let port = utils::find_port();
-    println!("http://127.0.0.1:{0}/", port);
-    Rex::new(port, 5)
+    // let port = utils::find_port();
+    // println!("http://127.0.0.1:{0}/", port);
+    Rex::default()
         .add_routes(Index)
         .add_routes(Dynamic)
+        .add_middleware(Midlewareprueba)
         .run();
 }

@@ -31,6 +31,11 @@ impl ThreadManager {
         self.workers.push(Worker::new(th));
         self.check();
     }
+    pub fn join(&mut self) {
+        while let Some(w) = self.workers.pop() {
+            w.join();
+        }
+    }
 
     pub fn wait(&mut self) {
         let mut temp = Vec::new();

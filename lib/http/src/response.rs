@@ -1,6 +1,7 @@
 use crate::statuscode;
 //
 use std::collections::HashMap;
+#[derive(Clone)]
 pub struct Response {
     pub version: String,
     pub status: statuscode::Status,

@@ -8,15 +8,13 @@ pub fn middleware(attr: TokenStream, item: TokenStream) -> TokenStream {
 
     let attrs: Vec<&str> = attr.split(",").collect();
     if attrs.len() < 2 {
-        panic!("No pass method or uri example: #[route(get,/index.html)]")
+        panic!("No pass method or uri example: #[middleware(get,/index.html)]")
     }
 
     let input = parse_macro_input!(item as ItemFn);
 
     let fn_name = input.sig.ident.clone();
     let p = get_params_name(&input, 0);
-
-    // println!("{:#?}", p);
 
     let block = input.block;
     let method = get_attrs(&attrs, 0);
@@ -25,16 +23,10 @@ pub fn middleware(attr: TokenStream, item: TokenStream) -> TokenStream {
     quote::quote! {
          #[derive(Clone)]
          pub struct #fn_name;
-        impl Route for #fn_name {
-            fn run(&self,#p:Request,mut client:Client)->thread::JoinHandle<()>{
-                let yo = self.clone();
-                let handle:thread::JoinHandle<()>  = thread::spawn(move||{
-                    let result = yo.callback(#p);
-                    let _ = client.write(result.http().as_bytes());
-                    let _ = client.close();
-                });
-                handle
-            }fn callback(&self,#p:Request)->Response {
+        impl Middleware for #fn_name {
+            fn run(&self,#p:Request)->middleware::State{
+                self.callback(#p)
+            }fn callback(&self,#p:Request)-> middleware::State{
                 #block
             }fn endpoint(&self)->(Method,String){
                 (Method::from(#method.to_string()),#endpoint.to_string())
@@ -50,7 +42,7 @@ fn get_attrs(a: &Vec<&str>, index: usize) -> String {
 }
 
 fn get_params_name(inpust: &ItemFn, index: usize) -> Ident {
-    let default = Ident::new("_", Span::call_site().into());
+    let default = Ident::new("_ignored_", Span::call_site().into());
     return match inpust.sig.inputs.get(index) {
         Some(fnarg) => {
             // println!("Fnarg {:#?}",fnarg );

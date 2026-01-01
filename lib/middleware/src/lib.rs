@@ -1,4 +1,4 @@
-use client::Client;
+// use client::Client;
 use http::{
     Method, Request, Response, equal_url, get_url_params_and_value, has_dinamy_params, url_split,
 };
@@ -8,8 +8,9 @@ use std::collections::HashMap;
 pub trait Middleware {
     fn endpoint(&self) -> (Method, String);
     fn callback(&self, request: Request) -> State;
+    fn run(&self, request: Request) -> State;
 }
-
+#[derive(Clone)]
 pub enum State {
     Continue,
     Response(Response),

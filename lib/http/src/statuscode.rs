@@ -1,5 +1,6 @@
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status
 // Standard http status code
+#[derive(Clone)]
 pub enum Status {
     Continue,
     SwitchingProtocols,
