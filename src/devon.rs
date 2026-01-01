@@ -8,8 +8,10 @@ use std::{
     net::TcpListener,
     sync::{LazyLock, Mutex},
 };
+
 use thread::ThreadManager;
 
+// Global state to stop  devonrex for some reason set to false
 static DEVONREX_GLOBAL: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(true));
 
 pub struct Rex {
@@ -59,10 +61,11 @@ impl Rex {
                 println!("{}", response.http());
                 client.write(response.http().as_bytes()).unwrap();
                 client.close().unwrap();
-            } else {
-                self.routes_handle(request, client);
+                return;
             }
         }
+
+        self.routes_handle(request, client);
     }
 
     pub fn routes_handle(&mut self, request: &mut Request, mut client: Client) {
@@ -70,7 +73,6 @@ impl Rex {
             let r = route.run(request.clone(), client);
             self.threadmanager.add(r);
         } else {
-            // println!("prueba");
             let mut r = Response::default();
             r.status = Status::NotFound;
             client.write(r.http().as_bytes()).unwrap();
@@ -102,6 +104,7 @@ impl Rex {
                     Ok((client_stream, _)) => {
                         let client = Client::new(client_stream);
                         let mut request = parser_http_client(&client);
+                        // println!("{:#?}", request.clone());
 
                         self.middleware_handle(&mut request, client);
                     }
@@ -118,21 +121,7 @@ impl Rex {
                 }
             }
 
-            println!("dev final {}", *DEVONREX_GLOBAL.lock().unwrap());
             self.threadmanager.join();
-            // for stream in lister.incoming() {
-            //     match stream {
-            //         Ok(client_stream) => {
-            //             let client = Client::new(client_stream);
-            //             let mut request = parser_http_client(&client);
-
-            //             self.middleware_handle(&mut request, client);
-            //         }
-
-            //         Err(e) => println!("Error {:#?}", e),
-            //     }
-            // }
-            //if lister
         }
     }
 }
