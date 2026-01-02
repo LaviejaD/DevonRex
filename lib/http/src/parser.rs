@@ -2,7 +2,7 @@ use crate::request;
 use client::Client;
 use std::collections::HashMap;
 use std::io::{prelude::*, BufReader};
-pub fn parser_http_client(client: &Client) -> request::Request {
+pub fn parser_http_client(client: Client) -> request::Request {
     //client.clone().read_to_string(&mut buffer_string).unwrap();
 
     let args = r"\r\n\r\n";
@@ -69,9 +69,9 @@ pub fn parser_http_client(client: &Client) -> request::Request {
             }
         }
     }
-    parser_http_request(raw_request)
+    parser_http_request(raw_request, client)
 }
-pub fn parser_http_request(raw_request: String) -> request::Request {
+pub fn parser_http_request(raw_request: String, client: Client) -> request::Request {
     let mut headers = HashMap::new();
     let mut query = HashMap::new();
 
@@ -126,5 +126,13 @@ pub fn parser_http_request(raw_request: String) -> request::Request {
         }
     }
 
-    request::Request::new(method, endpoint, version, headers, HashMap::new(), query)
+    request::Request::new(
+        method,
+        endpoint,
+        version,
+        headers,
+        HashMap::new(),
+        query,
+        client,
+    )
 }
