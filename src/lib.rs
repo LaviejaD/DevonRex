@@ -1,5 +1,6 @@
 // main lib
 pub mod devon;
+// utils
 pub mod utils;
 //other lib
 pub use client;
