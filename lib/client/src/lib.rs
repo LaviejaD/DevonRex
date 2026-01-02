@@ -2,7 +2,7 @@ use std::{
     io::Write,
     net::{Shutdown, TcpStream},
 };
-
+#[derive(Debug)]
 pub struct Client {
     stream: TcpStream,
 }
@@ -23,5 +23,15 @@ impl Client {
     pub fn close(&self) -> std::io::Result<()> {
         self.stream.shutdown(Shutdown::Both)?;
         Ok(())
+    }
+}
+
+impl Clone for Client {
+    fn clone(&self) -> Self {
+        let stream = match self.stream.try_clone() {
+            Ok(s) => s,
+            Err(_) => todo!("Si vez esto es un error"),
+        };
+        Self { stream }
     }
 }
