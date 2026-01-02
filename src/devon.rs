@@ -56,11 +56,11 @@ impl Rex {
     pub fn middleware_handle(&mut self, request: &mut Request, mut client: Client) {
         if let Some(middleware) = self.middleware.get(request) {
             if let middleware::State::Response(response) = middleware.callback(request.clone()) {
-                // let mut r = response.clone();
-                // r.status = Status::NotFound;
-                println!("{}", response.http());
-                client.write(response.http().as_bytes()).unwrap();
-                client.close().unwrap();
+                self.threadmanager.add(std::thread::spawn(move || {
+                    client.write(response.http().as_bytes()).unwrap();
+                    client.close().unwrap();
+                }));
+
                 return;
             }
         }
@@ -73,10 +73,13 @@ impl Rex {
             let r = route.run(request.clone(), client);
             self.threadmanager.add(r);
         } else {
-            let mut r = Response::default();
-            r.status = Status::NotFound;
-            client.write(r.http().as_bytes()).unwrap();
-            client.close().unwrap();
+            let r = std::thread::spawn(move || {
+                let mut r = Response::default();
+                r.status = Status::NotFound;
+                client.write(r.http().as_bytes()).unwrap();
+                client.close().unwrap();
+            });
+            self.threadmanager.add(r);
         }
     }
     pub fn stop() {
@@ -103,7 +106,7 @@ impl Rex {
                 match lister.accept() {
                     Ok((client_stream, _)) => {
                         let client = Client::new(client_stream);
-                        let mut request = parser_http_client(&client);
+                        let mut request = parser_http_client(client.clone());
                         // println!("{:#?}", request.clone());
 
                         self.middleware_handle(&mut request, client);
