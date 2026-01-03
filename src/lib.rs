@@ -19,4 +19,5 @@ pub mod prelude {
     pub use http::*;
     pub use router::*;
     pub use router_macro::*;
+    pub use std::thread;
 }

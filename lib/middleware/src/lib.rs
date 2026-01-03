@@ -10,7 +10,6 @@ pub trait Middleware {
     fn callback(&self, request: Request) -> State;
     fn run(&self, request: Request) -> State;
 }
-#[derive(Clone)]
 pub enum State {
     Continue,
     Response(Response),
@@ -33,8 +32,8 @@ impl Middlewares {
         let format = format!("{} {}", method.to_string(), endpoint.to_lowercase());
 
         match has_dinamy_params(endpoint.clone()) {
-            true => self.routes_dinamy.insert(format, Box::new(route)),
-            false => self.routes.insert(format, Box::new(route)),
+            | true => self.routes_dinamy.insert(format, Box::new(route)),
+            | false => self.routes.insert(format, Box::new(route)),
         };
     }
 

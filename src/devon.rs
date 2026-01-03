@@ -57,7 +57,7 @@ impl Rex {
         if let Some(middleware) = self.middleware.get(request) {
             if let middleware::State::Response(response) = middleware.callback(request.clone()) {
                 self.threadmanager.add(std::thread::spawn(move || {
-                    client.write(response.http().as_bytes()).unwrap();
+                    response.http(&mut client);
                     client.close().unwrap();
                 }));
 
@@ -76,7 +76,7 @@ impl Rex {
             let r = std::thread::spawn(move || {
                 let mut r = Response::default();
                 r.status = Status::NotFound;
-                client.write(r.http().as_bytes()).unwrap();
+                r.http(&mut client);
                 client.close().unwrap();
             });
             self.threadmanager.add(r);
@@ -89,8 +89,8 @@ impl Rex {
 
     pub fn run(&mut self) {
         let tl = match self.port {
-            p if p > 0 => TcpListener::bind(format!("127.0.0.1:{0}", self.port)),
-            _ => TcpListener::bind("127.0.0.1:0"),
+            | p if p > 0 => TcpListener::bind(format!("127.0.0.1:{0}", self.port)),
+            | _ => TcpListener::bind("127.0.0.1:0"),
         };
 
         if let Ok(lister) = tl {
@@ -104,19 +104,19 @@ impl Rex {
             //
             'main: loop {
                 match lister.accept() {
-                    Ok((client_stream, _)) => {
+                    | Ok((client_stream, _)) => {
                         let client = Client::new(client_stream);
                         let mut request = parser_http_client(client.clone());
                         // println!("{:#?}", request.clone());
 
                         self.middleware_handle(&mut request, client);
-                    }
-                    Err(ref e) if e.kind() == ErrorKind::WouldBlock => {
+                    },
+                    | Err(ref e) if e.kind() == ErrorKind::WouldBlock => {
                         // No incoming connection to process yet, continue the loop or sleep briefly
                         // A busy loop consumes CPU, so a small sleep or a more sophisticated event loop is recommended
                         std::thread::sleep(std::time::Duration::from_millis(100));
-                    }
-                    Err(e) => println!("{}", e),
+                    },
+                    | Err(e) => println!("{}", e),
                 }
 
                 if !*DEVONREX_GLOBAL.lock().unwrap() {
