@@ -33,11 +33,14 @@ impl Request {
         }
     }
     //read all bytes and return String
-    pub fn read_all_to_text(&self) -> String {
+    pub fn read_all_to_text(&self) -> Result<String, ()> {
         let Some(length) = self.headers.get("Content-Length") else {
-            return String::new();
+            return Err(());
         };
-        let length: usize = length.parse().unwrap();
+        let length: usize = match length.parse() {
+            | Ok(e) => e,
+            | Err(_) => 0,
+        };
         let mut buff = Vec::<u8>::new();
         let mut tempb = [0u8; 1024];
         loop {
@@ -49,7 +52,7 @@ impl Request {
         }
 
         let r = String::from_utf8(buff).unwrap();
-        r
+        Ok(r)
     }
     //  read all and return vec
     pub fn vec(&self) -> Vec<u8> {

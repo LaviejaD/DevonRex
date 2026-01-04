@@ -2,7 +2,7 @@ use client::Client;
 
 use crate::statuscode;
 
-use std::{collections::HashMap, io::ErrorKind};
+use std::collections::HashMap;
 #[derive(Debug)]
 pub struct Response {
     pub version: String,
@@ -61,22 +61,14 @@ impl Response {
         headers.push_str(&format!("\r\n\r\n{}", ""));
         let _ = client.write(headers.as_bytes());
 
-        match self.body {
-            | Body::Text(ref e) => match client.write(e.as_bytes()) {
-                | Ok(_) => (),
-                | Err(ref e) if e.kind() == ErrorKind::NotConnected => {
-                    println!("soy error {}", e);
-                    // println!("{:#?}", u);
-                    // println!("{:#?}", &self);
-                    ()
-                },
-                | Err(_) => (),
+        let _ = match self.body {
+            | Body::Text(e) => client.write(e.as_bytes()),
+            | Body::File(FileHandle::File(v)) => client.write(&v.as_slice()),
+            | Body::File(FileHandle::LargeFile(cb)) => {
+                cb(client);
+                Ok(())
             },
-            | Body::File(FileHandle::File(v)) => {
-                client.write(&v.as_slice()).expect("soy el error2")
-            },
-            | Body::File(FileHandle::LargeFile(cb)) => cb(client),
-            | Body::None => (),
-        }
+            | Body::None => Ok(()),
+        };
     }
 }

@@ -16,13 +16,12 @@ impl Client {
     }
     pub fn write(&mut self, buf: &[u8]) -> std::io::Result<()> {
         self.stream.write(&buf)?;
-        self.stream.flush()?;
-        Ok(())
+        self.stream.flush()
     }
 
     pub fn close(&self) -> std::io::Result<()> {
-        self.stream.shutdown(Shutdown::Both).unwrap();
-        Ok(())
+        let r = self.stream.shutdown(Shutdown::Both);
+        r
     }
 }
 

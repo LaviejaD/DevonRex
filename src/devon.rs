@@ -1,5 +1,5 @@
 use client::Client;
-use http::{parser_http_client, Request, Response, Status};
+use http::{parser_http_request, Request, Response, Status};
 use middleware;
 use router::{Route, Routes};
 use std::io::ErrorKind;
@@ -69,26 +69,28 @@ impl Rex {
     }
 
     pub fn routes_handle(&mut self, request: &mut Request, mut client: Client) {
-        let request1 = request.clone();
+        // let request1 = request.clone();
         if let Some(route) = self.routes.get(request) {
             let r = route.run(request.clone(), client);
             self.threadmanager.add(r);
         } else {
             let r = std::thread::spawn(move || {
-                println!("{:#?}", request1);
                 let mut r = Response::default();
                 r.status = Status::NotFound;
                 r.http(&mut client);
-                match client.close() {
-                    | Ok(_) => (),
-                    | Err(e) => println!("{:#?}", e),
-                }
+                let _ = client.close();
             });
             self.threadmanager.add(r);
         }
     }
     pub fn stop() {
-        let mut devorex_global = DEVONREX_GLOBAL.lock().unwrap();
+        let mut devorex_global = match DEVONREX_GLOBAL.lock() {
+            | Ok(d) => d,
+            | Err(e) => {
+                eprintln!("Error: On stop Devonrex");
+                e.into_inner()
+            },
+        };
         *devorex_global = false;
     }
 
@@ -102,19 +104,23 @@ impl Rex {
             if let Ok(addr) = lister.local_addr() {
                 self.port = addr.port();
             }
-            lister.set_nonblocking(true).unwrap();
+
+            match lister.set_nonblocking(true) {
+                | Ok(_) => (),
+                | Err(e) => eprint!("{e}"),
+            }
             println!("http://127.0.0.1:{0}", self.port);
-            *DEVONREX_GLOBAL.lock().unwrap() = true;
+            match DEVONREX_GLOBAL.lock() {
+                | Ok(mut d) => *d = true,
+                | Err(_) => (),
+            }
 
             //
             'main: loop {
                 match lister.accept() {
                     | Ok((client_stream, _)) => {
-                        client_stream.set_read_timeout(Some(std::time::Duration::from_secs(5))).unwrap();
-                        client_stream.set_write_timeout(Some(std::time::Duration::from_secs(5))).unwrap();
-
                         let client = Client::new(client_stream);
-                        let mut request = match parser_http_client(client.clone()) {
+                        let mut request = match parser_http_request(client.clone()) {
                             | Some(r) => r,
                             | None => {
                                 std::thread::spawn(move || {

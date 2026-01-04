@@ -44,9 +44,9 @@ impl Routes {
         );
 
         if let Some(r) = self.routes.get(&get) {
-            println!("soy parser {:#?}", r.endpoint());
             return Some(r);
         } else {
+            // try find in dynimic url
             let u2 = url_split(get.to_lowercase());
             let mut keys = self.routes_dinamy.keys();
 

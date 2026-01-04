@@ -1,4 +1,4 @@
-import { hola } form "./prueba.js"
+// import { hola } form "./prueba.js"
 
 // hola()
 let c = 0, ci = 0, cd = 0;

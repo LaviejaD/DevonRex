@@ -2,7 +2,6 @@ use crate::request;
 use client::Client;
 use std::collections::HashMap;
 use std::io::{prelude::*, BufReader};
-use std::sync::mpsc::RecvTimeoutError;
 pub fn parser_http_request(client: Client) -> Option<request::Request> {
     let args = r"\r\n\r\n";
     let args_len = args.len();
@@ -74,6 +73,7 @@ pub fn parser_http_request_raw(raw_request: String, client: Client) -> Option<re
     let mut method = String::new();
     let mut endpoint = String::new();
     let mut version = String::new();
+    #[allow(unused)]
     let mut url = String::new();
 
     let mut lines: Vec<_> = raw_request.lines().collect();
@@ -91,7 +91,6 @@ pub fn parser_http_request_raw(raw_request: String, client: Client) -> Option<re
         };
         match raw_headers.get(2) {
             | Some(r) => {
-                println!("soy r {r}");
                 if let Some(r2) = r.to_string().split("/").collect::<Vec<_>>().pop() {
                     version = r2.to_string()
                 } else {
