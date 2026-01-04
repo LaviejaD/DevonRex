@@ -2,12 +2,8 @@ use crate::request;
 use client::Client;
 use std::collections::HashMap;
 use std::io::{prelude::*, BufReader};
-pub fn parser_http_client(client: Client) -> Option<request::Request> {
-    // let mut buffer_string = String::new();
-
-    // client.read().read_to_string(&mut buffer_string).unwrap();
-    // println!("soy buffer {}", buffer_string);
-
+use std::sync::mpsc::RecvTimeoutError;
+pub fn parser_http_request(client: Client) -> Option<request::Request> {
     let args = r"\r\n\r\n";
     let args_len = args.len();
     let mut buffer = BufReader::with_capacity(args_len, client.read());
@@ -18,15 +14,11 @@ pub fn parser_http_client(client: Client) -> Option<request::Request> {
     let mut last = Vec::new();
 
     loop {
-        //    let buf = buffer.fill_buf().unwrap();
-
         match buffer.fill_buf() {
             | Ok(buf) => {
                 let mut byts = buf.to_vec();
                 let bytslen = byts.len();
-                //    println!()len byts {} contador_loop {},bytslen,contador_loop
                 let mut e = 0;
-
                 if args_len == bytslen && last.len() == bytslen {
                     if last[0] == byts[0] {
                         for i in 0..bytslen {
@@ -72,36 +64,41 @@ pub fn parser_http_client(client: Client) -> Option<request::Request> {
             },
         }
     }
-    parser_http_request(raw_request, client)
+    parser_http_request_raw(raw_request, client)
 }
-pub fn parser_http_request(raw_request: String, client: Client) -> Option<request::Request> {
+pub fn parser_http_request_raw(raw_request: String, client: Client) -> Option<request::Request> {
     let mut headers = HashMap::new();
     let mut query = HashMap::new();
 
-    let mut yew: Vec<&str> = Vec::new();
+    let mut raw_headers: Vec<&str> = Vec::new();
     let mut method = String::new();
     let mut endpoint = String::new();
     let mut version = String::new();
+    let mut url = String::new();
 
     let mut lines: Vec<_> = raw_request.lines().collect();
 
     if lines.len() > 0 {
-        yew.append(&mut lines.remove(0).split(" ").collect::<Vec<_>>());
+        raw_headers.append(&mut lines.remove(0).split(" ").collect::<Vec<_>>());
 
-        method = yew.get(0).unwrap().to_string();
-        let url = match yew.get(1) {
-            | Some(s) => s.to_string(),
-            | None => " ".to_string(),
+        match raw_headers.get(0) {
+            | Some(r) => method = r.to_string(),
+            | None => return None,
+        }
+        match raw_headers.get(1) {
+            | Some(s) => url = s.to_string(),
+            | None => return None,
         };
-        version = match yew.get(2) {
+        match raw_headers.get(2) {
             | Some(r) => {
+                println!("soy r {r}");
                 if let Some(r2) = r.to_string().split("/").collect::<Vec<_>>().pop() {
-                    r2.to_string()
+                    version = r2.to_string()
                 } else {
-                    " ".to_string()
+                    return None;
                 }
             },
-            | None => " ".to_string(),
+            | None => return None,
         };
 
         for header in lines {
