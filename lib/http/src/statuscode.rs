@@ -1,6 +1,6 @@
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status
 // Standard http status code
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Status {
     Continue,
     SwitchingProtocols,
@@ -72,79 +72,81 @@ pub enum Status {
 impl Status {
     pub fn to_string(&self) -> String {
         match self {
-            Status::Continue => String::from("100 Continue"),
-            Status::SwitchingProtocols => String::from("101 Switching Protocols"),
-            Status::Processing => String::from("102 Processing"),
-            Status::EarlyHints => String::from("103 Early Hints"),
-            Status::Ok => String::from("200 Ok"),
-            Status::Created => String::from("201 Created"),
-            Status::Accepted => String::from("202 Accepted"),
-            Status::NonAuthoritativeInformation => {
+            | Status::Continue => String::from("100 Continue"),
+            | Status::SwitchingProtocols => String::from("101 Switching Protocols"),
+            | Status::Processing => String::from("102 Processing"),
+            | Status::EarlyHints => String::from("103 Early Hints"),
+            | Status::Ok => String::from("200 Ok"),
+            | Status::Created => String::from("201 Created"),
+            | Status::Accepted => String::from("202 Accepted"),
+            | Status::NonAuthoritativeInformation => {
                 String::from("203 Non-Authoritative Information")
-            }
-            Status::NoContent => String::from("204 No Content"),
-            Status::ResetContent => String::from("205 Reset Content"),
-            Status::PartialContent => String::from("206 Partial Content"),
-            Status::MultiStatus => String::from("207 Multi-Status"),
-            Status::AlreadyReported => String::from("208 Already Reported"),
-            Status::ImUsed => String::from("226 IM Used"),
-            Status::MultipleChoices => String::from("300 Multiple Choices"),
-            Status::MovePermamently => String::from("301 Moved Permanently"),
-            Status::Found => String::from("302 Found"),
-            Status::SeeOther => String::from("303 See Other"),
-            Status::NotModified => String::from("304 Not Modified"),
-            Status::UseProxy => String::from("305 Use Proxy"),
-            Status::Unused => String::from("306 Unused"),
-            Status::TemporaryRedirect => String::from("307 Temporary Redirect"),
-            Status::PermanentRedirect => String::from("308 Permanent Redirect"),
-            Status::BadRequest => String::from("400 Bad Request"),
-            Status::Unauthorized => String::from("401 Unauthorized"),
-            Status::PaymentRequired => String::from("402 Payment Required"),
-            Status::Forbidden => String::from("403 Forbidden"),
-            Status::NotFound => String::from("404 Not Found"),
-            Status::MethodNotAllowed => String::from("405 Method Not Allowed"),
-            Status::NotAcceptable => String::from("406 Not Acceptable"),
-            Status::ProxyAuthenticationRequired => {
+            },
+            | Status::NoContent => String::from("204 No Content"),
+            | Status::ResetContent => String::from("205 Reset Content"),
+            | Status::PartialContent => String::from("206 Partial Content"),
+            | Status::MultiStatus => String::from("207 Multi-Status"),
+            | Status::AlreadyReported => String::from("208 Already Reported"),
+            | Status::ImUsed => String::from("226 IM Used"),
+            | Status::MultipleChoices => String::from("300 Multiple Choices"),
+            | Status::MovePermamently => String::from("301 Moved Permanently"),
+            | Status::Found => String::from("302 Found"),
+            | Status::SeeOther => String::from("303 See Other"),
+            | Status::NotModified => String::from("304 Not Modified"),
+            | Status::UseProxy => String::from("305 Use Proxy"),
+            | Status::Unused => String::from("306 Unused"),
+            | Status::TemporaryRedirect => String::from("307 Temporary Redirect"),
+            | Status::PermanentRedirect => String::from("308 Permanent Redirect"),
+            | Status::BadRequest => String::from("400 Bad Request"),
+            | Status::Unauthorized => String::from("401 Unauthorized"),
+            | Status::PaymentRequired => String::from("402 Payment Required"),
+            | Status::Forbidden => String::from("403 Forbidden"),
+            | Status::NotFound => String::from("404 Not Found"),
+            | Status::MethodNotAllowed => String::from("405 Method Not Allowed"),
+            | Status::NotAcceptable => String::from("406 Not Acceptable"),
+            | Status::ProxyAuthenticationRequired => {
                 String::from("407 Proxy Authentication Required")
-            }
-            Status::RequestTimeout => String::from("408 Request Timeout"),
-            Status::Conflict => String::from("409 Conflict"),
-            Status::Gone => String::from("410 Gone"),
-            Status::LengthRequired => String::from("411 Length Required"),
-            Status::PreconditionFailed => String::from("412 Precondition Failed"),
-            Status::ContentTooLarge => String::from("413 Content Too Large"),
-            Status::UriTooLong => String::from("414 URI Too Long"),
-            Status::UnsupportedMediaType => String::from("415 Unsupported Media Type"),
-            Status::RangeNotSatisfiable => String::from("416 Range Not Satisfiable"),
-            Status::ExpenctationFailed => String::from("417 Expectation Failed"),
-            Status::ImaTeapot => String::from("418 I'm a Teapot"),
-            Status::MisdirectedRequest => String::from("421 Misdirected Request"),
-            Status::UnprocessableContent => String::from("422 Unprocessable Content"),
-            Status::Locked => String::from("423 Locked"),
-            Status::FailedDependency => String::from("424 Failed Dependency"),
-            Status::TooEarly => String::from("425 Too Early"),
-            Status::UpgradeRequired => String::from("426 Upgrade Required"),
-            Status::PreconditionRequired => String::from("428 Precondition Required"),
-            Status::TooManyRequests => String::from("429 Too Many Requests"),
-            Status::RequestHeaderFieldsTooLarge => {
+            },
+            | Status::RequestTimeout => String::from("408 Request Timeout"),
+            | Status::Conflict => String::from("409 Conflict"),
+            | Status::Gone => String::from("410 Gone"),
+            | Status::LengthRequired => String::from("411 Length Required"),
+            | Status::PreconditionFailed => String::from("412 Precondition Failed"),
+            | Status::ContentTooLarge => String::from("413 Content Too Large"),
+            | Status::UriTooLong => String::from("414 URI Too Long"),
+            | Status::UnsupportedMediaType => String::from("415 Unsupported Media Type"),
+            | Status::RangeNotSatisfiable => String::from("416 Range Not Satisfiable"),
+            | Status::ExpenctationFailed => String::from("417 Expectation Failed"),
+            | Status::ImaTeapot => String::from("418 I'm a Teapot"),
+            | Status::MisdirectedRequest => String::from("421 Misdirected Request"),
+            | Status::UnprocessableContent => String::from("422 Unprocessable Content"),
+            | Status::Locked => String::from("423 Locked"),
+            | Status::FailedDependency => String::from("424 Failed Dependency"),
+            | Status::TooEarly => String::from("425 Too Early"),
+            | Status::UpgradeRequired => String::from("426 Upgrade Required"),
+            | Status::PreconditionRequired => String::from("428 Precondition Required"),
+            | Status::TooManyRequests => String::from("429 Too Many Requests"),
+            | Status::RequestHeaderFieldsTooLarge => {
                 String::from("431 Request Header Fields Too Large")
-            }
-            Status::UnavailableForLegalReasons => String::from("451 Unavailable For Legal Reasons"),
-            Status::InternalServerError => String::from("500 Internal Server Error"),
-            Status::NotImplemented => String::from("501 Not Implemented"),
-            Status::BadGateway => String::from("502 Bad Gateway"),
-            Status::ServiceUnavailable => String::from("503 Service Unavailable"),
-            Status::GatewayTimeout => String::from("504 Gateway Timeout"),
-            Status::HttpVersionNotSupported => String::from("505 Http Version Not Supported"),
-            Status::VariantAlsoNegotiattes => String::from("506 Variant Also Negotiattes"),
-            Status::InsufficientStorage => String::from("507 Insufficient Storage"),
-            Status::LoopDetected => String::from("508 Loop Detected"),
-            Status::NotExtended => String::from("510 Not Extended"),
-            Status::NetworkAuthenticationRequired => {
+            },
+            | Status::UnavailableForLegalReasons => {
+                String::from("451 Unavailable For Legal Reasons")
+            },
+            | Status::InternalServerError => String::from("500 Internal Server Error"),
+            | Status::NotImplemented => String::from("501 Not Implemented"),
+            | Status::BadGateway => String::from("502 Bad Gateway"),
+            | Status::ServiceUnavailable => String::from("503 Service Unavailable"),
+            | Status::GatewayTimeout => String::from("504 Gateway Timeout"),
+            | Status::HttpVersionNotSupported => String::from("505 Http Version Not Supported"),
+            | Status::VariantAlsoNegotiattes => String::from("506 Variant Also Negotiattes"),
+            | Status::InsufficientStorage => String::from("507 Insufficient Storage"),
+            | Status::LoopDetected => String::from("508 Loop Detected"),
+            | Status::NotExtended => String::from("510 Not Extended"),
+            | Status::NetworkAuthenticationRequired => {
                 String::from("511 Network Authentication Required")
-            }
+            },
 
-            Status::Custom(code, message) => format!("{} {}", code, message),
+            | Status::Custom(code, message) => format!("{} {}", code, message),
         }
     }
 }

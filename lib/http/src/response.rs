@@ -2,17 +2,22 @@ use client::Client;
 
 use crate::statuscode;
 
-use std::collections::HashMap;
+use std::{collections::HashMap, io::ErrorKind};
+#[derive(Debug)]
 pub struct Response {
     pub version: String,
     pub status: statuscode::Status,
     pub headers: HashMap<String, String>,
     pub body: Body,
 }
+#[derive(Debug)]
 pub enum FileHandle {
+    // Save all file on the memory and send
     File(Vec<u8>),
-    LargeFile(Box<fn(client::Client)>),
+    // ve her full control so she can manage the manual file.
+    LargeFile(Box<fn(&mut client::Client)>),
 }
+#[derive(Debug)]
 
 pub enum Body {
     Text(String),
@@ -57,9 +62,20 @@ impl Response {
         let _ = client.write(headers.as_bytes());
 
         match self.body {
-            | Body::Text(e) => client.write(e.as_bytes()).unwrap(),
-            | Body::File(FileHandle::File(v)) => client.write(&v.as_slice()).unwrap(),
-            | Body::File(FileHandle::LargeFile(_)) => todo!("Implent manager for large file < 1gb"),
+            | Body::Text(ref e) => match client.write(e.as_bytes()) {
+                | Ok(_) => (),
+                | Err(ref e) if e.kind() == ErrorKind::NotConnected => {
+                    println!("soy error {}", e);
+                    // println!("{:#?}", u);
+                    // println!("{:#?}", &self);
+                    ()
+                },
+                | Err(_) => (),
+            },
+            | Body::File(FileHandle::File(v)) => {
+                client.write(&v.as_slice()).expect("soy el error2")
+            },
+            | Body::File(FileHandle::LargeFile(cb)) => cb(client),
             | Body::None => (),
         }
     }

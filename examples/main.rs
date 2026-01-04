@@ -10,12 +10,26 @@ fn Index() -> Response {
     }
     response
 }
+
+#[route(get,/socket)]
+fn Socket(request: Request) -> Response {
+    println!("{:#?}", request);
+    let mut response = Response::default();
+    if let Ok(html) = fs::read_to_string("./public/index.html") {
+        response.html(html)
+    }
+    response
+}
+
 // http://127.0.0.1:8080/<file>
 #[route(get,/<file>)]
 fn Public(request: Request) -> Response {
     let mut response = Response::default();
     match request.parameters.get("file") {
         | Some(file) => {
+            // if file == "prueba.js" {
+            //     println!("{:#?}", request)
+            // }
             if let Ok(r) = fs::read_to_string(format!("./public/{}", file)) {
                 response.text(r)
             }
@@ -34,7 +48,7 @@ fn MidlewareExample() -> State {
 
 fn main() {
     Rex::default()
-        .set_port(33147)
+        // .set_port(33147)
         .add_routes(Index)
         .add_routes(Public)
         .add_middleware(MidlewareExample)

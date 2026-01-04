@@ -1,3 +1,6 @@
+import { hola } form "./prueba.js"
+
+// hola()
 let c = 0, ci = 0, cd = 0;
 const count = document.getElementById("count");
 const incCount = document.getElementById("incCount");

@@ -9,7 +9,7 @@ pub struct Request {
     pub query: HashMap<String, String>,
     pub http_version: String,
     pub headers: HashMap<String, String>,
-    client: Client,
+    pub client: Client,
 }
 
 impl Request {

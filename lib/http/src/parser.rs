@@ -2,8 +2,11 @@ use crate::request;
 use client::Client;
 use std::collections::HashMap;
 use std::io::{prelude::*, BufReader};
-pub fn parser_http_client(client: Client) -> request::Request {
-    //client.clone().read_to_string(&mut buffer_string).unwrap();
+pub fn parser_http_client(client: Client) -> Option<request::Request> {
+    // let mut buffer_string = String::new();
+
+    // client.read().read_to_string(&mut buffer_string).unwrap();
+    // println!("soy buffer {}", buffer_string);
 
     let args = r"\r\n\r\n";
     let args_len = args.len();
@@ -18,7 +21,7 @@ pub fn parser_http_client(client: Client) -> request::Request {
         //    let buf = buffer.fill_buf().unwrap();
 
         match buffer.fill_buf() {
-            Ok(buf) => {
+            | Ok(buf) => {
                 let mut byts = buf.to_vec();
                 let bytslen = byts.len();
                 //    println!()len byts {} contador_loop {},bytslen,contador_loop
@@ -39,14 +42,14 @@ pub fn parser_http_client(client: Client) -> request::Request {
                 }
                 if is_header {
                     match String::from_utf8(byts.clone()) {
-                        Ok(t) => {
+                        | Ok(t) => {
                             if t == args {
                                 is_header = false
                             }
-                        }
-                        Err(_) => {
+                        },
+                        | Err(_) => {
                             is_header = false;
-                        }
+                        },
                     }
                 }
                 if is_header {
@@ -62,16 +65,16 @@ pub fn parser_http_client(client: Client) -> request::Request {
                 if args_len > bytslen {
                     break;
                 }
-            }
-            Err(e) => {
+            },
+            | Err(e) => {
                 println!("{e}");
                 break;
-            }
+            },
         }
     }
     parser_http_request(raw_request, client)
 }
-pub fn parser_http_request(raw_request: String, client: Client) -> request::Request {
+pub fn parser_http_request(raw_request: String, client: Client) -> Option<request::Request> {
     let mut headers = HashMap::new();
     let mut query = HashMap::new();
 
@@ -87,18 +90,18 @@ pub fn parser_http_request(raw_request: String, client: Client) -> request::Requ
 
         method = yew.get(0).unwrap().to_string();
         let url = match yew.get(1) {
-            Some(s) => s.to_string(),
-            None => " ".to_string(),
+            | Some(s) => s.to_string(),
+            | None => " ".to_string(),
         };
         version = match yew.get(2) {
-            Some(r) => {
+            | Some(r) => {
                 if let Some(r2) = r.to_string().split("/").collect::<Vec<_>>().pop() {
                     r2.to_string()
                 } else {
                     " ".to_string()
                 }
-            }
-            None => " ".to_string(),
+            },
+            | None => " ".to_string(),
         };
 
         for header in lines {
@@ -116,17 +119,17 @@ pub fn parser_http_request(raw_request: String, client: Client) -> request::Requ
         endpoint = url_raw[0].to_string();
 
         match url_raw.get(1) {
-            Some(query_) => {
+            | Some(query_) => {
                 for q in query_.split("&") {
                     let _query: Vec<_> = q.split("=").collect();
                     query.insert(_query[0].to_string(), _query[1].to_string());
                 }
-            }
-            None => (),
+            },
+            | None => (),
         }
     }
 
-    request::Request::new(
+    let r = request::Request::new(
         method,
         endpoint,
         version,
@@ -134,5 +137,11 @@ pub fn parser_http_request(raw_request: String, client: Client) -> request::Requ
         HashMap::new(),
         query,
         client,
-    )
+    );
+
+    if r.method.to_string() != "None" {
+        return Some(r);
+    } else {
+        return None;
+    }
 }

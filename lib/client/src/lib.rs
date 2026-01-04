@@ -21,7 +21,7 @@ impl Client {
     }
 
     pub fn close(&self) -> std::io::Result<()> {
-        self.stream.shutdown(Shutdown::Both)?;
+        self.stream.shutdown(Shutdown::Both).unwrap();
         Ok(())
     }
 }
@@ -29,8 +29,8 @@ impl Client {
 impl Clone for Client {
     fn clone(&self) -> Self {
         let stream = match self.stream.try_clone() {
-            Ok(s) => s,
-            Err(_) => todo!("Si vez esto es un error"),
+            | Ok(s) => s,
+            | Err(_) => todo!("Si vez esto es un error"),
         };
         Self { stream }
     }

@@ -28,8 +28,8 @@ impl Routes {
         let format = format!("{} {}", method.to_string(), endpoint.to_lowercase());
 
         match has_dinamy_params(endpoint.clone()) {
-            true => self.routes_dinamy.insert(format, Box::new(route)),
-            false => self.routes.insert(format, Box::new(route)),
+            | true => self.routes_dinamy.insert(format, Box::new(route)),
+            | false => self.routes.insert(format, Box::new(route)),
         };
     }
 
@@ -44,6 +44,7 @@ impl Routes {
         );
 
         if let Some(r) = self.routes.get(&get) {
+            println!("soy parser {:#?}", r.endpoint());
             return Some(r);
         } else {
             let u2 = url_split(get.to_lowercase());
