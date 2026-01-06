@@ -29,7 +29,7 @@ pub fn middleware(attr: TokenStream, item: TokenStream) -> TokenStream {
             }fn callback(&self,#p:Request)-> middleware::State{
                 #block
             }fn endpoint(&self)->(Method,String){
-                (Method::from(#method.to_string()),#endpoint.to_string())
+                (Method::from_string(#method.to_string()),#endpoint.to_string())
             }
         }
     }
@@ -44,11 +44,11 @@ fn get_attrs(a: &Vec<&str>, index: usize) -> String {
 fn get_params_name(inpust: &ItemFn, index: usize) -> Ident {
     let default = Ident::new("_ignored_", Span::call_site().into());
     return match inpust.sig.inputs.get(index) {
-        Some(fnarg) => {
+        | Some(fnarg) => {
             // println!("Fnarg {:#?}",fnarg );
             match fnarg {
-                FnArg::Typed(t) => match *t.pat.clone() {
-                    Pat::Ident(i) => {
+                | FnArg::Typed(t) => match *t.pat.clone() {
+                    | Pat::Ident(i) => {
                         //           println!("indent pat {:#?}", &t);
                         // let prueba = t.ty.clone();
                         // match *prueba.clone() {
@@ -57,13 +57,13 @@ fn get_params_name(inpust: &ItemFn, index: usize) -> Ident {
                         // }
 
                         Ident::new(&i.ident.to_string().as_str(), Span::call_site().into())
-                    }
+                    },
 
-                    _ => default,
+                    | _ => default,
                 },
-                _ => default,
+                | _ => default,
             }
-        }
-        None => default,
+        },
+        | None => default,
     };
 }

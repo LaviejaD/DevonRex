@@ -38,7 +38,7 @@ pub fn route(attr: TokenStream, item: TokenStream) -> TokenStream {
             }fn callback(&self,#p:Request)->Response {
                 #block
             }fn endpoint(&self)->(Method,String){
-                (Method::from(#method.to_string()),#endpoint.to_string())
+                (Method::from_string(#method.to_string()),#endpoint.to_string())
             }
         }
     }

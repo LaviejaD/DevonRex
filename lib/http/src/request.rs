@@ -23,7 +23,7 @@ impl Request {
         client: Client,
     ) -> Self {
         Self {
-            method: Method::from(method),
+            method: Method::from_string(method),
             endpoint,
             http_version,
             headers,
